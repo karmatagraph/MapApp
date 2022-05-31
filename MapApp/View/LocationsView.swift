@@ -12,25 +12,16 @@ struct LocationsView: View {
     
     @EnvironmentObject private var vm: LocationsViewModel
     
+    
     var body: some View {
         ZStack {
-            Map(coordinateRegion: $vm.mapRegion)
+            mapView
                 .ignoresSafeArea()
             VStack() {
                 header
                     .padding()
                 Spacer()
-                ZStack {
-                    ForEach(vm.locations) { location in
-                        if vm.mapLocation == location {
-                            LocationPreviewView(location: location)
-                                .shadow(color: Color.black.opacity(0.3), radius: 20)
-                                .transition(.asymmetric(
-                                    insertion: .move(edge: .trailing),
-                                    removal: .move(edge: .leading)))
-                        }
-                    }
-                }
+                previewLayer
             }
             
         }
@@ -79,4 +70,32 @@ extension LocationsView {
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 15)
         
     }
+    
+    private var mapView: some View {
+        Map(coordinateRegion: $vm.mapRegion, annotationItems: vm.locations, annotationContent: { locations in
+            MapAnnotation(coordinate: locations.coordinates) {
+                MapAnnotationView()
+                    .scaleEffect(vm.mapLocation == locations ? 1 : 0.7)
+                    .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 14)
+                    .onTapGesture {
+                        vm.showNextLocation(location: locations)
+                    }
+            }
+        })
+    }
+    
+    private var previewLayer: some View {
+        ZStack {
+            ForEach(vm.locations) { location in
+                if vm.mapLocation == location {
+                    LocationPreviewView(location: location)
+                        .shadow(color: Color.black.opacity(0.3), radius: 20)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .trailing),
+                            removal: .move(edge: .leading)))
+                }
+            }
+        }
+    }
+    
 }
