@@ -14,6 +14,9 @@ class LocationsViewModel: ObservableObject {
     // All the locations loaded
     @Published var locations: [Location]
     
+    // show location detail via sheet
+    @Published var sheetLocation: Location? = nil
+    
     // Current location on the map
     @Published var mapLocation: Location {
         didSet {
@@ -57,6 +60,10 @@ class LocationsViewModel: ObservableObject {
             mapLocation = location
             showLocationList = false
         }
+    }
+    
+    func moreButtonTapped() {
+        LocationDetailView(location: mapLocation)
     }
     
     func nextButtonTapped() {
